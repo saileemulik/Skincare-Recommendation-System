@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Recommendations</title>
+</head>
+<body>
+    <div>
+        <h1>Product Recommendations</h1>
+        <label for="skinType">Skin Type:</label>
+        <input type="text" id="skinType">
+        <br>
+        <label for="concern">Concern:</label>
+        <input type="text" id="concern">
+        <br>
+        <button onclick="getRecommendations()">Get Recommendations</button>
+        <div id="recommendations"></div>
+    </div>
+
+    <script>
+        function getRecommendations() {
+            var skinType = document.getElementById("skinType").value;
+            var concern = document.getElementById("concern").value;
+
+            var url = "http://127.0.0.1:5000/recommend?skin_type=" + encodeURIComponent(skinType) + "&concern=" + encodeURIComponent(concern);
+
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch recommendations');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    displayRecommendations(data);
+                })
+                .catch(error => {
+                    console.error('Error fetching recommendations:', error);
+                    alert("Failed to fetch recommendations. Please try again later.");
+                });
+        }
+
+        function displayRecommendations(recommendations) {
+            var recommendationsDiv = document.getElementById("recommendations");
+            recommendationsDiv.innerHTML = ""; // Clear previous recommendations
+
+            recommendations.forEach(product => {
+                var productDiv = document.createElement("div");
+                productDiv.innerHTML = "<strong>" + product.product_name + "</strong><br>";
+                productDiv.innerHTML += "<img src='" + product.product_image_url + "' alt='" + product.product_name + "'><br><br>";
+                recommendationsDiv.appendChild(productDiv);
+            });
+        }
+    </script>
+</body>
+</html>
